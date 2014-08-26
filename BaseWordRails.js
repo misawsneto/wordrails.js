@@ -40,18 +40,20 @@ function ImageDto(id, title, original, small, medium, large) {
 	};
 }
 
-function NetworkDto(id, name, defaultTaxonomy) {
+function NetworkDto(id, name, trackingId, defaultTaxonomy) {
 	return {
 		id: id,
 		name: name,
+		trackingId: trackingId,
 		defaultTaxonomy: defaultTaxonomy
 	};
 }
 
-function PersonDto(id, name) {
+function PersonDto(id, name, username) {
 	return {
 		id: id,
-		name: name
+		name: name,
+		username: username
 	};
 }
 
@@ -132,6 +134,10 @@ function BaseWordRails(_url, _username, _password) {
         $.ajax({
             type: "POST",
             url: _url + "/j_spring_security_check",
+            crossDomain: true, 
+			xhrFields: {
+	            withCredentials: true
+	        },
             data: {
                 "j_username": _username,
                 "j_password": _password
@@ -141,6 +147,14 @@ function BaseWordRails(_url, _username, _password) {
     }
 
     var that = {};
+
+    that.getUrl = function(){
+    	return _url;
+    }
+
+    that.logIn = function(complete){
+		logIn(complete);    
+    } 
 
     that._ajax = function(settings) {
         var error = settings.error;
@@ -161,6 +175,10 @@ function BaseWordRails(_url, _username, _password) {
                 complete(jqXHR, textStatus);
             }
         };
+
+        settings.crossDomain = true 
+		settings.xhrFields = {withCredentials: true}
+
         $.ajax(settings);
     };    
 
@@ -236,39 +254,6 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findCellByRow = function(row, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/cells/search/findCellByRow",
-            data: {
-            	row: row
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findCellsPositioned = function(rowId, lowerLimit, upperLimit, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/cells/search/findCellsPositioned",
-            data: {
-            	rowId: rowId,
-            	lowerLimit: lowerLimit,
-            	upperLimit: upperLimit
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
 
     that.getCellRow = function(id, _success, _error, _complete) {
         that._ajax({
@@ -852,6 +837,22 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
+    that.putNetworkTaxonomies = function(id, taxonomies, _success, _error, _complete) {		
+    	var _data = "";
+    	for (var i = 0; i < taxonomies.length; ++i) {
+    		_data += taxonomies[i] + "\n";
+    	}
+        that._ajax({
+        	type: "PUT",
+            url: _url + "/api/networks/{id}/taxonomies",
+            data: _data,
+            contentType: "text/uri-list",
+            success: _success,
+            error: _error,
+            complete: _complete
+        });
+    };
+
     that.getNetworkDefaultTaxonomy = function(id, _success, _error, _complete) {
         that._ajax({
             url: _url + "/api/networks/{id}/defaultTaxonomy",
@@ -867,6 +868,19 @@ function BaseWordRails(_url, _username, _password) {
             url: _url + "/api/networks/{id}/defaultTaxonomy",
             contentType: "text/uri-list",
             success: _success,
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.getNetworkOwnedTaxonomies = function(id, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/networks/{id}/ownedTaxonomies",
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
             error: _error,
             complete: _complete
         });
@@ -945,6 +959,21 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
+    that.findByUsername = function(username, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/persons/search/findByUsername",
+            data: {
+            	username: username
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
 
     that.getPersonComments = function(id, _success, _error, _complete) {
         that._ajax({
@@ -1116,28 +1145,9 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.getTermPosts = function(termId, page, size, sort, _success, _error, _complete) {
+    that.findPostsAndPostsPromoted = function(stationId, termId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/getTermPosts",
-            data: {
-            	termId: termId,
-            	page: page,
-            	size: size,
-            	sort: sort
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findPosts = function(stationId, termId, page, size, sort, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/posts/search/findPosts",
+            url: _url + "/api/posts/search/findPostsAndPostsPromoted",
             data: {
             	stationId: stationId,
             	termId: termId,
@@ -1175,6 +1185,27 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
+    that.findPostsNotPositioned = function(stationId, termId, idsToExclude, page, size, sort, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/posts/search/findPostsNotPositioned",
+            data: {
+            	stationId: stationId,
+            	termId: termId,
+            	idsToExclude: idsToExclude,
+            	page: page,
+            	size: size,
+            	sort: sort
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
     that.findPostsFromOrPromotedToStation = function(stationId, page, size, sort, _success, _error, _complete) {
         that._ajax({
             url: _url + "/api/posts/search/findPostsFromOrPromotedToStation",
@@ -1194,9 +1225,28 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findPostsAndPostsPromoted = function(stationId, termId, page, size, sort, _success, _error, _complete) {
+    that.getPersonPosts = function(personId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/findPostsAndPostsPromoted",
+            url: _url + "/api/posts/search/getPersonPosts",
+            data: {
+            	personId: personId,
+            	page: page,
+            	size: size,
+            	sort: sort
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.findPosts = function(stationId, termId, page, size, sort, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/posts/search/findPosts",
             data: {
             	stationId: stationId,
             	termId: termId,
@@ -1214,13 +1264,11 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findPostsNotPositioned = function(stationId, termId, idsToExclude, page, size, sort, _success, _error, _complete) {
+    that.getTermPosts = function(termId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/findPostsNotPositioned",
+            url: _url + "/api/posts/search/getTermPosts",
             data: {
-            	stationId: stationId,
             	termId: termId,
-            	idsToExclude: idsToExclude,
             	page: page,
             	size: size,
             	sort: sort
@@ -1583,38 +1631,6 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findByPerspective = function(perspective, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/rows/search/findByPerspective",
-            data: {
-            	perspective: perspective
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findByPerspectiveAndTerm = function(perspective, term, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/rows/search/findByPerspectiveAndTerm",
-            data: {
-            	perspective: perspective,
-            	term: term
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
 
     that.getRowCells = function(id, _success, _error, _complete) {
         that._ajax({
@@ -1839,9 +1855,9 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.getStationTaxonomies = function(id, _success, _error, _complete) {
+    that.getStationOwnedTaxonomies = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stations/{id}/taxonomies",
+            url: _url + "/api/stations/{id}/ownedTaxonomies",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2084,25 +2100,9 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findTaxonomiesByStation = function(station, _success, _error, _complete) {
+    that.getTaxonomyNetworks = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/search/findTaxonomiesByStation",
-            data: {
-            	station: station
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.getTaxonomyTerms = function(id, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/taxonomies/{id}/terms",
+            url: _url + "/api/taxonomies/{id}/networks",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2126,19 +2126,32 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.getTaxonomyNetwork = function(id, _success, _error, _complete) {
+    that.getTaxonomyTerms = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/{id}/network",
+            url: _url + "/api/taxonomies/{id}/terms",
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.getTaxonomyOwningNetwork = function(id, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/taxonomies/{id}/owningNetwork",
             success: _success,
             error: _error,
             complete: _complete
         });
     };
 
-    that.putTaxonomyNetwork = function(id, network, _success, _error, _complete) {
+    that.putTaxonomyOwningNetwork = function(id, owningNetwork, _success, _error, _complete) {
         that._ajax({
         	type: "PUT",
-            url: _url + "/api/taxonomies/{id}/network",
+            url: _url + "/api/taxonomies/{id}/owningNetwork",
             contentType: "text/uri-list",
             success: _success,
             error: _error,
@@ -2146,19 +2159,19 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.getTaxonomyStation = function(id, _success, _error, _complete) {
+    that.getTaxonomyOwningStation = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/{id}/station",
+            url: _url + "/api/taxonomies/{id}/owningStation",
             success: _success,
             error: _error,
             complete: _complete
         });
     };
 
-    that.putTaxonomyStation = function(id, station, _success, _error, _complete) {
+    that.putTaxonomyOwningStation = function(id, owningStation, _success, _error, _complete) {
         that._ajax({
         	type: "PUT",
-            url: _url + "/api/taxonomies/{id}/station",
+            url: _url + "/api/taxonomies/{id}/owningStation",
             contentType: "text/uri-list",
             success: _success,
             error: _error,
@@ -2239,11 +2252,11 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findByParent = function(term, _success, _error, _complete) {
+    that.countTerms = function(termsIds, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/search/findByParent",
+            url: _url + "/api/terms/search/countTerms",
             data: {
-            	term: term
+            	termsIds: termsIds
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -2255,9 +2268,9 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findRoots = function(taxonomyId, page, size, sort, _success, _error, _complete) {
+    that.findRootsPage = function(taxonomyId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/search/findRoots",
+            url: _url + "/api/terms/search/findRootsPage",
             data: {
             	taxonomyId: taxonomyId,
             	page: page,
@@ -2279,22 +2292,6 @@ function BaseWordRails(_url, _username, _password) {
             url: _url + "/api/terms/search/findRoots",
             data: {
             	taxonomyId: taxonomyId
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.countTerms = function(termsIds, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/terms/search/countTerms",
-            data: {
-            	termsIds: termsIds
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -2484,54 +2481,6 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findByPerspective = function(perspective, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/termPerspectives/search/findByPerspective",
-            data: {
-            	perspective: perspective
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findRootTermByStationPerspective = function(stationPerspectiveId, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/termPerspectives/search/findRootTermByStationPerspective",
-            data: {
-            	stationPerspectiveId: stationPerspectiveId
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findPerspectiveAndTerm = function(stationPerspectiveId, termId, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/termPerspectives/search/findPerspectiveAndTerm",
-            data: {
-            	stationPerspectiveId: stationPerspectiveId,
-            	termId: termId
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
 
     that.getTermPerspectiveSplashedPost = function(id, _success, _error, _complete) {
         that._ajax({
