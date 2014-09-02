@@ -57,12 +57,13 @@ function PersonDto(id, name, username) {
 	};
 }
 
-function PostDto(id, date, title, body, author, station) {
+function PostDto(id, date, title, body, sponsor, author, station) {
 	return {
 		id: id,
 		date: date,
 		title: title,
 		body: body,
+		sponsor: sponsor,
 		author: author,
 		station: station
 	};
@@ -78,22 +79,22 @@ function PromotionDto(id, date, post, promoter, station) {
 	};
 }
 
-function RowDto(id, type, featuringPerspective, index, term) {
+function RowDto(id, type, index, term) {
 	return {
 		id: id,
 		type: type,
-		featuringPerspective: featuringPerspective,
 		index: index,
 		term: term
 	};
 }
 
-function StationDto(id, name, networks, perspectives) {
+function StationDto(id, name, networks, perspectives, open) {
 	return {
 		id: id,
 		name: name,
 		networks: networks,
-		perspectives: perspectives
+		perspectives: perspectives,
+		open: open
 	};
 }
 
@@ -121,10 +122,9 @@ function TermDto(id, name, taxonomy) {
 	};
 }
 
-function TermPerspectiveDto(id, featuredRow, perspective) {
+function TermPerspectiveDto(id, perspective) {
 	return {
 		id: id,
-		featuredRow: featuredRow,
 		perspective: perspective
 	};
 }
@@ -257,7 +257,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getCellRow = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/cells/{id}/row",
+            url: _url + "/api/cells/" + id + "/row",
             success: _success,
             error: _error,
             complete: _complete
@@ -265,19 +265,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putCellRow = function(id, row, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/cells/{id}/row",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (row === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/cells/" + id + "/row",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/cells/" + id + "/row",
+    	        contentType: "text/uri-list",
+    	        data: row,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getCellTerm = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/cells/{id}/term",
+            url: _url + "/api/cells/" + id + "/term",
             success: _success,
             error: _error,
             complete: _complete
@@ -285,19 +296,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putCellTerm = function(id, term, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/cells/{id}/term",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (term === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/cells/" + id + "/term",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/cells/" + id + "/term",
+    	        contentType: "text/uri-list",
+    	        data: term,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getCellPost = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/cells/{id}/post",
+            url: _url + "/api/cells/" + id + "/post",
             success: _success,
             error: _error,
             complete: _complete
@@ -305,14 +327,25 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putCellPost = function(id, post, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/cells/{id}/post",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (post === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/cells/" + id + "/post",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/cells/" + id + "/post",
+    	        contentType: "text/uri-list",
+    	        data: post,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 /*---------------------------------------------------------------------------*/
 
@@ -391,7 +424,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getCommentImages = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/comments/{id}/images",
+            url: _url + "/api/comments/" + id + "/images",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -404,7 +437,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getCommentAuthor = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/comments/{id}/author",
+            url: _url + "/api/comments/" + id + "/author",
             success: _success,
             error: _error,
             complete: _complete
@@ -412,19 +445,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putCommentAuthor = function(id, author, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/comments/{id}/author",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (author === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/comments/" + id + "/author",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/comments/" + id + "/author",
+    	        contentType: "text/uri-list",
+    	        data: author,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getCommentPost = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/comments/{id}/post",
+            url: _url + "/api/comments/" + id + "/post",
             success: _success,
             error: _error,
             complete: _complete
@@ -432,14 +476,25 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putCommentPost = function(id, post, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/comments/{id}/post",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (post === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/comments/" + id + "/post",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/comments/" + id + "/post",
+    	        contentType: "text/uri-list",
+    	        data: post,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 /*---------------------------------------------------------------------------*/
 
@@ -593,7 +648,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getImageComment = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/images/{id}/comment",
+            url: _url + "/api/images/" + id + "/comment",
             success: _success,
             error: _error,
             complete: _complete
@@ -601,19 +656,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putImageComment = function(id, comment, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/images/{id}/comment",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (comment === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/images/" + id + "/comment",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/images/" + id + "/comment",
+    	        contentType: "text/uri-list",
+    	        data: comment,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getImageOriginal = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/images/{id}/original",
+            url: _url + "/api/images/" + id + "/original",
             success: _success,
             error: _error,
             complete: _complete
@@ -621,19 +687,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putImageOriginal = function(id, original, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/images/{id}/original",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (original === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/images/" + id + "/original",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/images/" + id + "/original",
+    	        contentType: "text/uri-list",
+    	        data: original,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getImageSmall = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/images/{id}/small",
+            url: _url + "/api/images/" + id + "/small",
             success: _success,
             error: _error,
             complete: _complete
@@ -641,19 +718,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putImageSmall = function(id, small, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/images/{id}/small",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (small === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/images/" + id + "/small",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/images/" + id + "/small",
+    	        contentType: "text/uri-list",
+    	        data: small,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getImageMedium = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/images/{id}/medium",
+            url: _url + "/api/images/" + id + "/medium",
             success: _success,
             error: _error,
             complete: _complete
@@ -661,19 +749,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putImageMedium = function(id, medium, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/images/{id}/medium",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (medium === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/images/" + id + "/medium",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/images/" + id + "/medium",
+    	        contentType: "text/uri-list",
+    	        data: medium,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getImageLarge = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/images/{id}/large",
+            url: _url + "/api/images/" + id + "/large",
             success: _success,
             error: _error,
             complete: _complete
@@ -681,19 +780,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putImageLarge = function(id, large, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/images/{id}/large",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (large === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/images/" + id + "/large",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/images/" + id + "/large",
+    	        contentType: "text/uri-list",
+    	        data: large,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getImagePost = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/images/{id}/post",
+            url: _url + "/api/images/" + id + "/post",
             success: _success,
             error: _error,
             complete: _complete
@@ -701,19 +811,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putImagePost = function(id, post, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/images/{id}/post",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (post === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/images/" + id + "/post",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/images/" + id + "/post",
+    	        contentType: "text/uri-list",
+    	        data: post,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getImageFeaturingPosts = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/images/{id}/featuringPosts",
+            url: _url + "/api/images/" + id + "/featuringPosts",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -800,7 +921,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getNetworkPersons = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/networks/{id}/persons",
+            url: _url + "/api/networks/" + id + "/persons",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -813,7 +934,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getNetworkStations = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/networks/{id}/stations",
+            url: _url + "/api/networks/" + id + "/stations",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -826,7 +947,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getNetworkTaxonomies = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/networks/{id}/taxonomies",
+            url: _url + "/api/networks/" + id + "/taxonomies",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -844,9 +965,9 @@ function BaseWordRails(_url, _username, _password) {
     	}
         that._ajax({
         	type: "PUT",
-            url: _url + "/api/networks/{id}/taxonomies",
-            data: _data,
+            url: _url + "/api/networks/" + id + "/taxonomies",
             contentType: "text/uri-list",
+            data: _data,        
             success: _success,
             error: _error,
             complete: _complete
@@ -855,7 +976,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getNetworkDefaultTaxonomy = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/networks/{id}/defaultTaxonomy",
+            url: _url + "/api/networks/" + id + "/defaultTaxonomy",
             success: _success,
             error: _error,
             complete: _complete
@@ -863,19 +984,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putNetworkDefaultTaxonomy = function(id, defaultTaxonomy, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/networks/{id}/defaultTaxonomy",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (defaultTaxonomy === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/networks/" + id + "/defaultTaxonomy",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/networks/" + id + "/defaultTaxonomy",
+    	        contentType: "text/uri-list",
+    	        data: defaultTaxonomy,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getNetworkOwnedTaxonomies = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/networks/{id}/ownedTaxonomies",
+            url: _url + "/api/networks/" + id + "/ownedTaxonomies",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -977,7 +1109,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPersonComments = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/persons/{id}/comments",
+            url: _url + "/api/persons/" + id + "/comments",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -990,7 +1122,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPersonNetworks = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/persons/{id}/networks",
+            url: _url + "/api/persons/" + id + "/networks",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1008,9 +1140,9 @@ function BaseWordRails(_url, _username, _password) {
     	}
         that._ajax({
         	type: "PUT",
-            url: _url + "/api/persons/{id}/networks",
-            data: _data,
+            url: _url + "/api/persons/" + id + "/networks",
             contentType: "text/uri-list",
+            data: _data,        
             success: _success,
             error: _error,
             complete: _complete
@@ -1019,7 +1151,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPersonStations = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/persons/{id}/stations",
+            url: _url + "/api/persons/" + id + "/stations",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1037,9 +1169,9 @@ function BaseWordRails(_url, _username, _password) {
     	}
         that._ajax({
         	type: "PUT",
-            url: _url + "/api/persons/{id}/stations",
-            data: _data,
+            url: _url + "/api/persons/" + id + "/stations",
             contentType: "text/uri-list",
+            data: _data,        
             success: _success,
             error: _error,
             complete: _complete
@@ -1048,7 +1180,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPersonPosts = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/persons/{id}/posts",
+            url: _url + "/api/persons/" + id + "/posts",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1061,7 +1193,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPersonPromotions = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/persons/{id}/promotions",
+            url: _url + "/api/persons/" + id + "/promotions",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1145,32 +1277,11 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findPostsAndPostsPromoted = function(stationId, termId, page, size, sort, _success, _error, _complete) {
+    that.findPostsFromOrPromotedToStation = function(stationId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/findPostsAndPostsPromoted",
+            url: _url + "/api/posts/search/findPostsFromOrPromotedToStation",
             data: {
             	stationId: stationId,
-            	termId: termId,
-            	page: page,
-            	size: size,
-            	sort: sort
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.getStationTermPosts = function(stationId, termId, page, size, sort, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/posts/search/getStationTermPosts",
-            data: {
-            	stationId: stationId,
-            	termId: termId,
             	page: page,
             	size: size,
             	sort: sort
@@ -1206,11 +1317,12 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findPostsFromOrPromotedToStation = function(stationId, page, size, sort, _success, _error, _complete) {
+    that.findByStationIdAndTitle = function(stationId, title, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/findPostsFromOrPromotedToStation",
+            url: _url + "/api/posts/search/findByStationIdAndTitle",
             data: {
             	stationId: stationId,
+            	title: title,
             	page: page,
             	size: size,
             	sort: sort
@@ -1225,11 +1337,52 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.getPersonPosts = function(personId, page, size, sort, _success, _error, _complete) {
+    that.findPostsAndPostsPromoted = function(stationId, termId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/getPersonPosts",
+            url: _url + "/api/posts/search/findPostsAndPostsPromoted",
             data: {
-            	personId: personId,
+            	stationId: stationId,
+            	termId: termId,
+            	page: page,
+            	size: size,
+            	sort: sort
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.findByStationIdAndAuthorId = function(stationId, authorId, page, size, sort, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/posts/search/findByStationIdAndAuthorId",
+            data: {
+            	stationId: stationId,
+            	authorId: authorId,
+            	page: page,
+            	size: size,
+            	sort: sort
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.findByStationIdAndTermsId = function(stationId, termId, page, size, sort, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/posts/search/findByStationIdAndTermsId",
+            data: {
+            	stationId: stationId,
+            	termId: termId,
             	page: page,
             	size: size,
             	sort: sort
@@ -1264,14 +1417,11 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.getTermPosts = function(termId, page, size, sort, _success, _error, _complete) {
+    that.findPostById = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/getTermPosts",
+            url: _url + "/api/posts/search/findPostById",
             data: {
-            	termId: termId,
-            	page: page,
-            	size: size,
-            	sort: sort
+            	id: id
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -1285,7 +1435,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPostComments = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/comments",
+            url: _url + "/api/posts/" + id + "/comments",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1298,7 +1448,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPostFeaturedImage = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/featuredImage",
+            url: _url + "/api/posts/" + id + "/featuredImage",
             success: _success,
             error: _error,
             complete: _complete
@@ -1306,19 +1456,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putPostFeaturedImage = function(id, featuredImage, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/posts/{id}/featuredImage",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (featuredImage === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/posts/" + id + "/featuredImage",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/posts/" + id + "/featuredImage",
+    	        contentType: "text/uri-list",
+    	        data: featuredImage,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getPostImages = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/images",
+            url: _url + "/api/posts/" + id + "/images",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1331,7 +1492,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPostAuthor = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/author",
+            url: _url + "/api/posts/" + id + "/author",
             success: _success,
             error: _error,
             complete: _complete
@@ -1339,19 +1500,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putPostAuthor = function(id, author, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/posts/{id}/author",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (author === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/posts/" + id + "/author",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/posts/" + id + "/author",
+    	        contentType: "text/uri-list",
+    	        data: author,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getPostPromotions = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/promotions",
+            url: _url + "/api/posts/" + id + "/promotions",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1364,7 +1536,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPostStation = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/station",
+            url: _url + "/api/posts/" + id + "/station",
             success: _success,
             error: _error,
             complete: _complete
@@ -1372,19 +1544,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putPostStation = function(id, station, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/posts/{id}/station",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (station === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/posts/" + id + "/station",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/posts/" + id + "/station",
+    	        contentType: "text/uri-list",
+    	        data: station,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getPostTerms = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/terms",
+            url: _url + "/api/posts/" + id + "/terms",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1402,9 +1585,9 @@ function BaseWordRails(_url, _username, _password) {
     	}
         that._ajax({
         	type: "PUT",
-            url: _url + "/api/posts/{id}/terms",
-            data: _data,
+            url: _url + "/api/posts/" + id + "/terms",
             contentType: "text/uri-list",
+            data: _data,        
             success: _success,
             error: _error,
             complete: _complete
@@ -1413,7 +1596,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPostSplashingPerspective = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/{id}/splashingPerspective",
+            url: _url + "/api/posts/" + id + "/splashingPerspective",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1500,7 +1683,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getPromotionPost = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/promotions/{id}/post",
+            url: _url + "/api/promotions/" + id + "/post",
             success: _success,
             error: _error,
             complete: _complete
@@ -1508,19 +1691,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putPromotionPost = function(id, post, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/promotions/{id}/post",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (post === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/promotions/" + id + "/post",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/promotions/" + id + "/post",
+    	        contentType: "text/uri-list",
+    	        data: post,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getPromotionPromoter = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/promotions/{id}/promoter",
+            url: _url + "/api/promotions/" + id + "/promoter",
             success: _success,
             error: _error,
             complete: _complete
@@ -1528,19 +1722,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putPromotionPromoter = function(id, promoter, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/promotions/{id}/promoter",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (promoter === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/promotions/" + id + "/promoter",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/promotions/" + id + "/promoter",
+    	        contentType: "text/uri-list",
+    	        data: promoter,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getPromotionStation = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/promotions/{id}/station",
+            url: _url + "/api/promotions/" + id + "/station",
             success: _success,
             error: _error,
             complete: _complete
@@ -1548,14 +1753,25 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putPromotionStation = function(id, station, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/promotions/{id}/station",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (station === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/promotions/" + id + "/station",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/promotions/" + id + "/station",
+    	        contentType: "text/uri-list",
+    	        data: station,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 /*---------------------------------------------------------------------------*/
 
@@ -1634,7 +1850,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getRowCells = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/rows/{id}/cells",
+            url: _url + "/api/rows/" + id + "/cells",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1645,9 +1861,40 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
+    that.getRowFeaturingPerspective = function(id, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/rows/" + id + "/featuringPerspective",
+            success: _success,
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.putRowFeaturingPerspective = function(id, featuringPerspective, _success, _error, _complete) {
+    	if (featuringPerspective === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/rows/" + id + "/featuringPerspective",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/rows/" + id + "/featuringPerspective",
+    	        contentType: "text/uri-list",
+    	        data: featuringPerspective,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
+    };
+
     that.getRowTerm = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/rows/{id}/term",
+            url: _url + "/api/rows/" + id + "/term",
             success: _success,
             error: _error,
             complete: _complete
@@ -1655,19 +1902,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putRowTerm = function(id, term, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/rows/{id}/term",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (term === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/rows/" + id + "/term",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/rows/" + id + "/term",
+    	        contentType: "text/uri-list",
+    	        data: term,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getRowPerspective = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/rows/{id}/perspective",
+            url: _url + "/api/rows/" + id + "/perspective",
             success: _success,
             error: _error,
             complete: _complete
@@ -1675,14 +1933,25 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putRowPerspective = function(id, perspective, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/rows/{id}/perspective",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (perspective === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/rows/" + id + "/perspective",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/rows/" + id + "/perspective",
+    	        contentType: "text/uri-list",
+    	        data: perspective,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 /*---------------------------------------------------------------------------*/
 
@@ -1776,7 +2045,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getStationNetworks = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stations/{id}/networks",
+            url: _url + "/api/stations/" + id + "/networks",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1794,9 +2063,9 @@ function BaseWordRails(_url, _username, _password) {
     	}
         that._ajax({
         	type: "PUT",
-            url: _url + "/api/stations/{id}/networks",
-            data: _data,
+            url: _url + "/api/stations/" + id + "/networks",
             contentType: "text/uri-list",
+            data: _data,        
             success: _success,
             error: _error,
             complete: _complete
@@ -1805,7 +2074,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getStationPersons = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stations/{id}/persons",
+            url: _url + "/api/stations/" + id + "/persons",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1818,7 +2087,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getStationPosts = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stations/{id}/posts",
+            url: _url + "/api/stations/" + id + "/posts",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1831,7 +2100,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getStationPromotions = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stations/{id}/promotions",
+            url: _url + "/api/stations/" + id + "/promotions",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1844,7 +2113,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getStationPerspectives = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stations/{id}/perspectives",
+            url: _url + "/api/stations/" + id + "/perspectives",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1857,7 +2126,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getStationOwnedTaxonomies = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stations/{id}/ownedTaxonomies",
+            url: _url + "/api/stations/" + id + "/ownedTaxonomies",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -1959,7 +2228,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getStationPerspectiveStation = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stationPerspectives/{id}/station",
+            url: _url + "/api/stationPerspectives/" + id + "/station",
             success: _success,
             error: _error,
             complete: _complete
@@ -1967,19 +2236,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putStationPerspectiveStation = function(id, station, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/stationPerspectives/{id}/station",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (station === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/stationPerspectives/" + id + "/station",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/stationPerspectives/" + id + "/station",
+    	        contentType: "text/uri-list",
+    	        data: station,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getStationPerspectiveTaxonomy = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stationPerspectives/{id}/taxonomy",
+            url: _url + "/api/stationPerspectives/" + id + "/taxonomy",
             success: _success,
             error: _error,
             complete: _complete
@@ -1987,19 +2267,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putStationPerspectiveTaxonomy = function(id, taxonomy, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/stationPerspectives/{id}/taxonomy",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (taxonomy === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/stationPerspectives/" + id + "/taxonomy",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/stationPerspectives/" + id + "/taxonomy",
+    	        contentType: "text/uri-list",
+    	        data: taxonomy,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getStationPerspectivePerspectives = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/stationPerspectives/{id}/perspectives",
+            url: _url + "/api/stationPerspectives/" + id + "/perspectives",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2100,9 +2391,25 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
+    that.findByStationId = function(stationId, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/taxonomies/search/findByStationId",
+            data: {
+            	stationId: stationId
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
     that.getTaxonomyNetworks = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/{id}/networks",
+            url: _url + "/api/taxonomies/" + id + "/networks",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2115,7 +2422,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTaxonomyDefaultNetworks = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/{id}/defaultNetworks",
+            url: _url + "/api/taxonomies/" + id + "/defaultNetworks",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2128,7 +2435,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTaxonomyTerms = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/{id}/terms",
+            url: _url + "/api/taxonomies/" + id + "/terms",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2141,7 +2448,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTaxonomyOwningNetwork = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/{id}/owningNetwork",
+            url: _url + "/api/taxonomies/" + id + "/owningNetwork",
             success: _success,
             error: _error,
             complete: _complete
@@ -2149,19 +2456,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putTaxonomyOwningNetwork = function(id, owningNetwork, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/taxonomies/{id}/owningNetwork",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (owningNetwork === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/taxonomies/" + id + "/owningNetwork",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/taxonomies/" + id + "/owningNetwork",
+    	        contentType: "text/uri-list",
+    	        data: owningNetwork,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getTaxonomyOwningStation = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/taxonomies/{id}/owningStation",
+            url: _url + "/api/taxonomies/" + id + "/owningStation",
             success: _success,
             error: _error,
             complete: _complete
@@ -2169,14 +2487,25 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putTaxonomyOwningStation = function(id, owningStation, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/taxonomies/{id}/owningStation",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (owningStation === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/taxonomies/" + id + "/owningStation",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/taxonomies/" + id + "/owningStation",
+    	        contentType: "text/uri-list",
+    	        data: owningStation,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 /*---------------------------------------------------------------------------*/
 
@@ -2252,11 +2581,14 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.countTerms = function(termsIds, _success, _error, _complete) {
+    that.findTermsByParentId = function(termId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/search/countTerms",
+            url: _url + "/api/terms/search/findTermsByParentId",
             data: {
-            	termsIds: termsIds
+            	termId: termId,
+            	page: page,
+            	size: size,
+            	sort: sort
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -2303,9 +2635,25 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
+    that.countTerms = function(termsIds, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/terms/search/countTerms",
+            data: {
+            	termsIds: termsIds
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
     that.getTermCells = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/{id}/cells",
+            url: _url + "/api/terms/" + id + "/cells",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2318,7 +2666,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTermPosts = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/{id}/posts",
+            url: _url + "/api/terms/" + id + "/posts",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2331,7 +2679,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTermRows = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/{id}/rows",
+            url: _url + "/api/terms/" + id + "/rows",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2344,7 +2692,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTermTaxonomy = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/{id}/taxonomy",
+            url: _url + "/api/terms/" + id + "/taxonomy",
             success: _success,
             error: _error,
             complete: _complete
@@ -2352,19 +2700,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putTermTaxonomy = function(id, taxonomy, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/terms/{id}/taxonomy",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (taxonomy === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/terms/" + id + "/taxonomy",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/terms/" + id + "/taxonomy",
+    	        contentType: "text/uri-list",
+    	        data: taxonomy,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getTermParent = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/{id}/parent",
+            url: _url + "/api/terms/" + id + "/parent",
             success: _success,
             error: _error,
             complete: _complete
@@ -2372,19 +2731,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putTermParent = function(id, parent, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/terms/{id}/parent",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (parent === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/terms/" + id + "/parent",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/terms/" + id + "/parent",
+    	        contentType: "text/uri-list",
+    	        data: parent,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getTermChildren = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/{id}/children",
+            url: _url + "/api/terms/" + id + "/children",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2397,7 +2767,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTermPerspectives = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/{id}/perspectives",
+            url: _url + "/api/terms/" + id + "/perspectives",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2484,7 +2854,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTermPerspectiveSplashedPost = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/termPerspectives/{id}/splashedPost",
+            url: _url + "/api/termPerspectives/" + id + "/splashedPost",
             success: _success,
             error: _error,
             complete: _complete
@@ -2492,19 +2862,61 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putTermPerspectiveSplashedPost = function(id, splashedPost, _success, _error, _complete) {
+    	if (splashedPost === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/termPerspectives/" + id + "/splashedPost",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/termPerspectives/" + id + "/splashedPost",
+    	        contentType: "text/uri-list",
+    	        data: splashedPost,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
+    };
+
+    that.getTermPerspectiveFeaturedRow = function(id, _success, _error, _complete) {
         that._ajax({
-        	type: "PUT",
-            url: _url + "/api/termPerspectives/{id}/splashedPost",
-            contentType: "text/uri-list",
+            url: _url + "/api/termPerspectives/" + id + "/featuredRow",
             success: _success,
             error: _error,
             complete: _complete
         });
     };
 
+    that.putTermPerspectiveFeaturedRow = function(id, featuredRow, _success, _error, _complete) {
+    	if (featuredRow === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/termPerspectives/" + id + "/featuredRow",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/termPerspectives/" + id + "/featuredRow",
+    	        contentType: "text/uri-list",
+    	        data: featuredRow,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
+    };
+
     that.getTermPerspectiveRows = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/termPerspectives/{id}/rows",
+            url: _url + "/api/termPerspectives/" + id + "/rows",
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
                     _success(_data.content, _textStatus, _jqXHR);
@@ -2517,7 +2929,7 @@ function BaseWordRails(_url, _username, _password) {
 
     that.getTermPerspectivePerspective = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/termPerspectives/{id}/perspective",
+            url: _url + "/api/termPerspectives/" + id + "/perspective",
             success: _success,
             error: _error,
             complete: _complete
@@ -2525,19 +2937,30 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putTermPerspectivePerspective = function(id, perspective, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/termPerspectives/{id}/perspective",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (perspective === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/termPerspectives/" + id + "/perspective",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/termPerspectives/" + id + "/perspective",
+    	        contentType: "text/uri-list",
+    	        data: perspective,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 
     that.getTermPerspectiveTerm = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/termPerspectives/{id}/term",
+            url: _url + "/api/termPerspectives/" + id + "/term",
             success: _success,
             error: _error,
             complete: _complete
@@ -2545,14 +2968,25 @@ function BaseWordRails(_url, _username, _password) {
     };
 
     that.putTermPerspectiveTerm = function(id, term, _success, _error, _complete) {
-        that._ajax({
-        	type: "PUT",
-            url: _url + "/api/termPerspectives/{id}/term",
-            contentType: "text/uri-list",
-            success: _success,
-            error: _error,
-            complete: _complete
-        });
+    	if (term === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/termPerspectives/" + id + "/term",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/termPerspectives/" + id + "/term",
+    	        contentType: "text/uri-list",
+    	        data: term,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
     };
 /*---------------------------------------------------------------------------*/
 
