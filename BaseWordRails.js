@@ -1,9 +1,8 @@
-function CellDto(id, index, row, term, post) {
+function CellDto(id, index, row, post) {
 	return {
 		id: id,
 		index: index,
 		row: row,
-		term: term,
 		post: post
 	};
 }
@@ -79,12 +78,11 @@ function PromotionDto(id, date, post, promoter, station) {
 	};
 }
 
-function RowDto(id, type, index, term) {
+function RowDto(id, type, index) {
 	return {
 		id: id,
 		type: type,
-		index: index,
-		term: term
+		index: index
 	};
 }
 
@@ -146,6 +144,15 @@ function BaseWordRails(_url, _username, _password) {
         });
     }
 
+    function logOut(complete) {
+        $.ajax({
+            type: "POST",
+            url: _url + "/j_spring_security_logout",
+            crossDomain: true, 
+            complete: complete
+        });
+    }
+
     var that = {};
 
     that.getUrl = function(){
@@ -180,8 +187,44 @@ function BaseWordRails(_url, _username, _password) {
 		settings.xhrFields = {withCredentials: true}
 
         $.ajax(settings);
-    };    
+    };
 
+    that.findPostsAndPostsPromotedByAuthorId = function(stationId, authorId, _page, _size, _sort, _success, _error, _complete) {
+		that._ajax({
+            url: _url + "/api/posts/" + stationId + "/findPostsAndPostsPromotedByAuthorId",
+            data: {
+                page: _page,
+                size: _size,
+                sort: _sort,
+                authorId: authorId
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    }; 
+
+    that.putPassword = function(oldPassword, newPassword, _success, _error, _complete) {
+		that._ajax({
+            url: _url + "/api/persons/me/password",
+            type: "PUT",
+            data: {
+            	oldPassword: oldPassword,
+            	newPassword: newPassword
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };    
 /*---------------------------------------------------------------------------*/
     that.getCells = function(_page, _size, _sort, _success, _error, _complete) {
 		that._ajax({
@@ -421,6 +464,21 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
+    that.findPostCommentsOrderByDate = function(postId, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/comments/search/findPostCommentsOrderByDate",
+            data: {
+            	postId: postId
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
 
     that.getCommentImages = function(id, _success, _error, _complete) {
         that._ajax({
@@ -1296,96 +1354,11 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findPostsNotPositioned = function(stationId, termId, idsToExclude, page, size, sort, _success, _error, _complete) {
+    that.findPostById = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/findPostsNotPositioned",
+            url: _url + "/api/posts/search/findPostById",
             data: {
-            	stationId: stationId,
-            	termId: termId,
-            	idsToExclude: idsToExclude,
-            	page: page,
-            	size: size,
-            	sort: sort
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findByStationIdAndTitle = function(stationId, title, page, size, sort, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/posts/search/findByStationIdAndTitle",
-            data: {
-            	stationId: stationId,
-            	title: title,
-            	page: page,
-            	size: size,
-            	sort: sort
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findPostsAndPostsPromoted = function(stationId, termId, page, size, sort, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/posts/search/findPostsAndPostsPromoted",
-            data: {
-            	stationId: stationId,
-            	termId: termId,
-            	page: page,
-            	size: size,
-            	sort: sort
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findByStationIdAndAuthorId = function(stationId, authorId, page, size, sort, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/posts/search/findByStationIdAndAuthorId",
-            data: {
-            	stationId: stationId,
-            	authorId: authorId,
-            	page: page,
-            	size: size,
-            	sort: sort
-            },
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.findByStationIdAndTermsId = function(stationId, termId, page, size, sort, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/posts/search/findByStationIdAndTermsId",
-            data: {
-            	stationId: stationId,
-            	termId: termId,
-            	page: page,
-            	size: size,
-            	sort: sort
+            	id: id
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -1417,11 +1390,36 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findPostById = function(id, _success, _error, _complete) {
+    that.findPostsNotPositioned = function(stationId, termId, idsToExclude, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/posts/search/findPostById",
+            url: _url + "/api/posts/search/findPostsNotPositioned",
             data: {
-            	id: id
+            	stationId: stationId,
+            	termId: termId,
+            	idsToExclude: idsToExclude,
+            	page: page,
+            	size: size,
+            	sort: sort
+            },
+            success: function(_data, _textStatus, _jqXHR) {
+                if (_success) {
+                    _success(_data.content, _textStatus, _jqXHR);
+                }
+            },
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.findPostsAndPostsPromoted = function(stationId, termId, page, size, sort, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/posts/search/findPostsAndPostsPromoted",
+            data: {
+            	stationId: stationId,
+            	termId: termId,
+            	page: page,
+            	size: size,
+            	sort: sort
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -1589,19 +1587,6 @@ function BaseWordRails(_url, _username, _password) {
             contentType: "text/uri-list",
             data: _data,        
             success: _success,
-            error: _error,
-            complete: _complete
-        });
-    };
-
-    that.getPostSplashingPerspective = function(id, _success, _error, _complete) {
-        that._ajax({
-            url: _url + "/api/posts/" + id + "/splashingPerspective",
-            success: function(_data, _textStatus, _jqXHR) {
-                if (_success) {
-                    _success(_data.content, _textStatus, _jqXHR);
-                }
-            },
             error: _error,
             complete: _complete
         });
@@ -1885,6 +1870,37 @@ function BaseWordRails(_url, _username, _password) {
     	        url: _url + "/api/rows/" + id + "/featuringPerspective",
     	        contentType: "text/uri-list",
     	        data: featuringPerspective,
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });	
+    	}
+    };
+
+    that.getRowSplashedPerspective = function(id, _success, _error, _complete) {
+        that._ajax({
+            url: _url + "/api/rows/" + id + "/splashedPerspective",
+            success: _success,
+            error: _error,
+            complete: _complete
+        });
+    };
+
+    that.putRowSplashedPerspective = function(id, splashedPerspective, _success, _error, _complete) {
+    	if (splashedPerspective === null) {
+    	    that._ajax({
+    	    	type: "DELETE",
+    	    	url: _url + "/api/rows/" + id + "/splashedPerspective",
+    	        success: _success,
+    	        error: _error,
+    	        complete: _complete
+    	    });		
+    	} else {
+    	    that._ajax({
+    	    	type: "PUT",
+    	        url: _url + "/api/rows/" + id + "/splashedPerspective",
+    	        contentType: "text/uri-list",
+    	        data: splashedPerspective,
     	        success: _success,
     	        error: _error,
     	        complete: _complete
@@ -2581,14 +2597,11 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.findTermsByParentId = function(termId, page, size, sort, _success, _error, _complete) {
+    that.countTerms = function(termsIds, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/search/findTermsByParentId",
+            url: _url + "/api/terms/search/countTerms",
             data: {
-            	termId: termId,
-            	page: page,
-            	size: size,
-            	sort: sort
+            	termsIds: termsIds
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -2635,11 +2648,14 @@ function BaseWordRails(_url, _username, _password) {
         });
     };
 
-    that.countTerms = function(termsIds, _success, _error, _complete) {
+    that.findTermsByParentId = function(termId, page, size, sort, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/terms/search/countTerms",
+            url: _url + "/api/terms/search/findTermsByParentId",
             data: {
-            	termsIds: termsIds
+            	termId: termId,
+            	page: page,
+            	size: size,
+            	sort: sort
             },
             success: function(_data, _textStatus, _jqXHR) {
                 if (_success) {
@@ -2852,20 +2868,20 @@ function BaseWordRails(_url, _username, _password) {
     };
 
 
-    that.getTermPerspectiveSplashedPost = function(id, _success, _error, _complete) {
+    that.getTermPerspectiveSplashedRow = function(id, _success, _error, _complete) {
         that._ajax({
-            url: _url + "/api/termPerspectives/" + id + "/splashedPost",
+            url: _url + "/api/termPerspectives/" + id + "/splashedRow",
             success: _success,
             error: _error,
             complete: _complete
         });
     };
 
-    that.putTermPerspectiveSplashedPost = function(id, splashedPost, _success, _error, _complete) {
-    	if (splashedPost === null) {
+    that.putTermPerspectiveSplashedRow = function(id, splashedRow, _success, _error, _complete) {
+    	if (splashedRow === null) {
     	    that._ajax({
     	    	type: "DELETE",
-    	    	url: _url + "/api/termPerspectives/" + id + "/splashedPost",
+    	    	url: _url + "/api/termPerspectives/" + id + "/splashedRow",
     	        success: _success,
     	        error: _error,
     	        complete: _complete
@@ -2873,9 +2889,9 @@ function BaseWordRails(_url, _username, _password) {
     	} else {
     	    that._ajax({
     	    	type: "PUT",
-    	        url: _url + "/api/termPerspectives/" + id + "/splashedPost",
+    	        url: _url + "/api/termPerspectives/" + id + "/splashedRow",
     	        contentType: "text/uri-list",
-    	        data: splashedPost,
+    	        data: splashedRow,
     	        success: _success,
     	        error: _error,
     	        complete: _complete
